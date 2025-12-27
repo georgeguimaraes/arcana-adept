@@ -13,7 +13,7 @@ defmodule Adept.Application do
       {DNSCluster, query: Application.get_env(:adept, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Adept.PubSub},
       # Arcana embeddings serving for semantic search
-      {Arcana.Embeddings.Serving, []},
+      Arcana.Embedding.Local,
       # Start to serve requests, typically the last entry
       AdeptWeb.Endpoint
     ]
