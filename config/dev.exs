@@ -14,10 +14,7 @@ config :adept, Adept.Repo,
 # Configure Arcana
 config :arcana,
   repo: Adept.Repo,
-  embedding: [
-    model: "BAAI/bge-small-en-v1.5",
-    dimensions: 384
-  ]
+  embedding: {:local, model: "BAAI/bge-small-en-v1.5", dimensions: 384}
 
 # Uncomment and configure to enable LLM features (RAG answers, evaluation)
 # config :arcana, :llm, fn prompt, _context ->
