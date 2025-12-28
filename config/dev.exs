@@ -13,7 +13,21 @@ config :adept, Adept.Repo,
 
 # Configure Arcana
 config :arcana,
-  repo: Adept.Repo
+  repo: Adept.Repo,
+  embedding: [
+    model: "BAAI/bge-small-en-v1.5",
+    dimensions: 384
+  ]
+
+# Uncomment and configure to enable LLM features (RAG answers, evaluation)
+# config :arcana, :llm, fn prompt, _context ->
+#   # Example using Ollama:
+#   # {:ok, %{body: body}} = Req.post("http://localhost:11434/api/generate",
+#   #   json: %{model: "llama3.2", prompt: prompt, stream: false}
+#   # )
+#   # {:ok, body["response"]}
+#   {:error, :not_configured}
+# end
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

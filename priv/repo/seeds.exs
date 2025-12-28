@@ -2,12 +2,12 @@
 #
 #     mix run priv/repo/seeds.exs
 #
-# Seed some sample documents for Arcana
+# Seed sample documents for Arcana, organized into collections
 
 alias Adept.Repo
 
-# Sample documents about Elixir and Phoenix
-documents = [
+# Elixir Language Guides
+elixir_docs = [
   """
   # Getting Started with Elixir
 
@@ -29,31 +29,6 @@ documents = [
   asdf plugin add elixir
   asdf install elixir latest
   ```
-  """,
-  """
-  # Phoenix Framework Overview
-
-  Phoenix is a productive web framework that does not compromise speed or maintainability.
-  It leverages Elixir's performance and concurrency to build highly scalable web applications.
-
-  ## Key Components
-
-  - **Endpoints**: Entry point for HTTP requests
-  - **Routers**: Map URLs to controllers
-  - **Controllers**: Handle request/response cycle
-  - **Views/Templates**: Render HTML responses
-  - **LiveView**: Real-time UI without JavaScript
-
-  ## Creating a New Project
-
-  ```bash
-  mix phx.new my_app
-  cd my_app
-  mix ecto.setup
-  mix phx.server
-  ```
-
-  Visit http://localhost:4000 to see your app.
   """,
   """
   # Understanding GenServer in Elixir
@@ -86,6 +61,136 @@ documents = [
   end
   ```
   """,
+  """
+  # Pattern Matching in Elixir
+
+  Pattern matching is one of Elixir's most powerful features. It allows you to match
+  against data structures and bind variables in a single operation.
+
+  ## Basic Examples
+
+  ```elixir
+  # Matching tuples
+  {:ok, result} = {:ok, 42}
+
+  # Matching lists
+  [head | tail] = [1, 2, 3]
+  # head = 1, tail = [2, 3]
+
+  # Matching maps
+  %{name: name} = %{name: "Alice", age: 30}
+  # name = "Alice"
+  ```
+
+  ## In Function Clauses
+
+  ```elixir
+  def greet(%{name: name}), do: "Hello, #{name}!"
+  def greet(_), do: "Hello, stranger!"
+  ```
+
+  Pattern matching makes code more declarative and easier to understand.
+  """
+]
+
+# Phoenix Framework Guides
+phoenix_docs = [
+  """
+  # Phoenix Framework Overview
+
+  Phoenix is a productive web framework that does not compromise speed or maintainability.
+  It leverages Elixir's performance and concurrency to build highly scalable web applications.
+
+  ## Key Components
+
+  - **Endpoints**: Entry point for HTTP requests
+  - **Routers**: Map URLs to controllers
+  - **Controllers**: Handle request/response cycle
+  - **Views/Templates**: Render HTML responses
+  - **LiveView**: Real-time UI without JavaScript
+
+  ## Creating a New Project
+
+  ```bash
+  mix phx.new my_app
+  cd my_app
+  mix ecto.setup
+  mix phx.server
+  ```
+
+  Visit http://localhost:4000 to see your app.
+  """,
+  """
+  # LiveView: Real-time UIs with Elixir
+
+  Phoenix LiveView enables rich, real-time user experiences with server-rendered HTML.
+  No JavaScript required for most interactive features.
+
+  ## How It Works
+
+  1. Initial page load is server-rendered HTML
+  2. WebSocket connection established
+  3. User events sent to server
+  4. Server updates state and sends diff
+  5. Client patches DOM efficiently
+
+  ## Example
+
+  ```elixir
+  defmodule CounterLive do
+    use Phoenix.LiveView
+
+    def mount(_params, _session, socket) do
+      {:ok, assign(socket, count: 0)}
+    end
+
+    def handle_event("increment", _, socket) do
+      {:noreply, update(socket, :count, &(&1 + 1))}
+    end
+
+    def render(assigns) do
+      ~H\"\"\"
+      <button phx-click="increment">Count: <%= @count %></button>
+      \"\"\"
+    end
+  end
+  ```
+  """,
+  """
+  # Phoenix Channels for Real-time Communication
+
+  Channels provide a way to handle real-time communication in Phoenix.
+  They're built on WebSockets and provide pub/sub functionality.
+
+  ## Use Cases
+
+  - Chat applications
+  - Live notifications
+  - Collaborative editing
+  - Real-time dashboards
+  - Multiplayer games
+
+  ## Example
+
+  ```elixir
+  defmodule MyAppWeb.RoomChannel do
+    use Phoenix.Channel
+
+    def join("room:" <> room_id, _params, socket) do
+      {:ok, assign(socket, :room_id, room_id)}
+    end
+
+    def handle_in("new_message", %{"body" => body}, socket) do
+      broadcast!(socket, "new_message", %{body: body})
+      {:noreply, socket}
+    end
+  end
+  ```
+  """
+]
+
+# Ecto Database Guides
+ecto_docs = [
   """
   # Ecto: Database Wrapper for Elixir
 
@@ -124,48 +229,99 @@ documents = [
   ```
   """,
   """
-  # LiveView: Real-time UIs with Elixir
+  # Ecto Queries
 
-  Phoenix LiveView enables rich, real-time user experiences with server-rendered HTML.
-  No JavaScript required for most interactive features.
+  Ecto provides a powerful query DSL that compiles to efficient SQL.
 
-  ## How It Works
-
-  1. Initial page load is server-rendered HTML
-  2. WebSocket connection established
-  3. User events sent to server
-  4. Server updates state and sends diff
-  5. Client patches DOM efficiently
-
-  ## Example
+  ## Basic Queries
 
   ```elixir
-  defmodule CounterLive do
-    use Phoenix.LiveView
+  # Get all users
+  Repo.all(User)
 
-    def mount(_params, _session, socket) do
-      {:ok, assign(socket, count: 0)}
-    end
+  # Filter with where
+  Repo.all(from u in User, where: u.age > 18)
 
-    def handle_event("increment", _, socket) do
-      {:noreply, update(socket, :count, &(&1 + 1))}
-    end
+  # Select specific fields
+  Repo.all(from u in User, select: {u.name, u.email})
+  ```
 
-    def render(assigns) do
-      ~H\"\"\"
-      <button phx-click="increment">Count: <%= @count %></button>
-      \"\"\"
+  ## Composable Queries
+
+  ```elixir
+  def active(query) do
+    from u in query, where: u.active == true
+  end
+
+  def by_age(query, age) do
+    from u in query, where: u.age >= ^age
+  end
+
+  # Compose them
+  User
+  |> active()
+  |> by_age(21)
+  |> Repo.all()
+  ```
+  """,
+  """
+  # Ecto Migrations
+
+  Migrations allow you to evolve your database schema over time.
+
+  ## Creating Migrations
+
+  ```bash
+  mix ecto.gen.migration create_users
+  ```
+
+  ## Migration Example
+
+  ```elixir
+  defmodule MyApp.Repo.Migrations.CreateUsers do
+    use Ecto.Migration
+
+    def change do
+      create table(:users) do
+        add :name, :string, null: false
+        add :email, :string, null: false
+        add :age, :integer
+
+        timestamps()
+      end
+
+      create unique_index(:users, [:email])
     end
   end
   ```
+
+  Run with `mix ecto.migrate`.
   """
 ]
 
-IO.puts("Ingesting #{length(documents)} sample documents...")
+IO.puts("Ingesting sample documents into collections...")
 
-for {doc, index} <- Enum.with_index(documents, 1) do
-  {:ok, _} = Arcana.ingest(doc, repo: Repo, format: :markdown)
-  IO.puts("  Ingested document #{index}/#{length(documents)}")
+IO.puts("\n  Collection: elixir-guides")
+
+for {doc, index} <- Enum.with_index(elixir_docs, 1) do
+  {:ok, _} = Arcana.ingest(doc, repo: Repo, format: :markdown, collection: "elixir-guides")
+  IO.puts("    Ingested document #{index}/#{length(elixir_docs)}")
 end
 
-IO.puts("\nDone! Visit http://localhost:4000/arcana to see the dashboard.")
+IO.puts("\n  Collection: phoenix-guides")
+
+for {doc, index} <- Enum.with_index(phoenix_docs, 1) do
+  {:ok, _} = Arcana.ingest(doc, repo: Repo, format: :markdown, collection: "phoenix-guides")
+  IO.puts("    Ingested document #{index}/#{length(phoenix_docs)}")
+end
+
+IO.puts("\n  Collection: ecto-guides")
+
+for {doc, index} <- Enum.with_index(ecto_docs, 1) do
+  {:ok, _} = Arcana.ingest(doc, repo: Repo, format: :markdown, collection: "ecto-guides")
+  IO.puts("    Ingested document #{index}/#{length(ecto_docs)}")
+end
+
+total = length(elixir_docs) + length(phoenix_docs) + length(ecto_docs)
+IO.puts("\nDone! Ingested #{total} documents into 3 collections.")
+IO.puts("Visit http://localhost:4000/arcana to see the dashboard.")
