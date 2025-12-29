@@ -14,7 +14,7 @@ config :adept, Adept.Repo,
 # Configure Arcana
 config :arcana,
   repo: Adept.Repo,
-  embedder: {:zai, api_key: System.get_env("ZAI_API_TOKEN")}
+  embedder: :local
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
