@@ -7,6 +7,9 @@ defmodule Adept.Application do
 
   @impl true
   def start(_type, _args) do
+    # Attach Arcana telemetry handlers for logging
+    Adept.ArcanaTelemetry.attach()
+
     children = [
       AdeptWeb.Telemetry,
       Adept.Repo,
