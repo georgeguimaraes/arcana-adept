@@ -6,7 +6,8 @@ defmodule Adept.Repo.Migrations.ChangeEmbeddingDimensions do
     execute "DROP INDEX IF EXISTS arcana_chunks_embedding_idx"
 
     # Clear existing embeddings (they're incompatible with new dimensions)
-    execute "TRUNCATE arcana_chunks"
+    # CASCADE needed because arcana_evaluation_test_cases references arcana_chunks
+    execute "TRUNCATE arcana_chunks CASCADE"
     execute "UPDATE arcana_documents SET status = 'pending', chunk_count = 0"
 
     # Change vector column from 384 to 1536 dimensions
@@ -21,7 +22,7 @@ defmodule Adept.Repo.Migrations.ChangeEmbeddingDimensions do
 
   def down do
     execute "DROP INDEX IF EXISTS arcana_chunks_embedding_idx"
-    execute "TRUNCATE arcana_chunks"
+    execute "TRUNCATE arcana_chunks CASCADE"
     execute "UPDATE arcana_documents SET status = 'pending', chunk_count = 0"
     execute "ALTER TABLE arcana_chunks ALTER COLUMN embedding TYPE vector(384)"
 
