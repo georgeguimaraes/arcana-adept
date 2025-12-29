@@ -28,7 +28,7 @@ alias Adept.Repo
 
 "priv/corpus/doctor_who.json"
 |> File.read!()
-|> Jason.decode!()
+|> JSON.decode!()
 |> Enum.each(fn %{"title" => title, "content" => content} ->
   {:ok, _} = Arcana.ingest(content,
     repo: Repo,
