@@ -7,6 +7,11 @@
 # General application configuration
 import Config
 
+# Nx backend for local embeddings
+config :nx,
+  default_backend: EXLA.Backend,
+  default_defn_options: [compiler: EXLA]
+
 config :adept,
   ecto_repos: [Adept.Repo],
   generators: [timestamp_type: :utc_datetime]

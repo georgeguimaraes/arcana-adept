@@ -41,6 +41,7 @@ defmodule Adept.MixProject do
   defp deps do
     [
       {:arcana, path: "../arcana"},
+      {:exla, "~> 0.9"},
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},

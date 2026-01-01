@@ -16,6 +16,20 @@ mix setup
 mix phx.server
 ```
 
+## Nx Backend
+
+This app uses [EXLA](https://hexdocs.pm/exla) for local embeddings. On Apple Silicon, you can use [EMLX](https://github.com/elixir-nx/emlx) instead:
+
+```elixir
+# mix.exs
+{:emlx, "~> 0.1"}  # instead of {:exla, "~> 0.9"}
+
+# config/config.exs
+config :nx,
+  default_backend: EMLX.Backend,
+  default_defn_options: [compiler: EMLX]
+```
+
 Visit [localhost:4000/arcana](http://localhost:4000/arcana) to access the dashboard.
 
 ## Embedding the Doctor Who Corpus
