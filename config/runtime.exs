@@ -7,12 +7,8 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 
-# Configure Arcana LLM with Z.ai (thinking disabled for faster responses)
-config :arcana,
-       :llm,
-       {"zai:glm-4.7",
-        api_key: System.get_env("ZAI_API_TOKEN"),
-        provider_options: [thinking: %{type: "disabled"}]}
+# Configure Arcana LLM with Z.ai
+config :arcana, :llm, {"zai:glm-4.7", api_key: System.get_env("ZAI_API_TOKEN")}
 
 # ## Using releases
 #
