@@ -67,7 +67,10 @@ defmodule Adept.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:req, "~> 0.5"},
-      {:floki, "~> 0.37"}
+      {:floki, "~> 0.37"},
+
+      # Community detection for GraphRAG
+      {:ex_leiden, "~> 0.5"}
     ]
   end
 

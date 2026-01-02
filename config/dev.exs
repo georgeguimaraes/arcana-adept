@@ -16,7 +16,6 @@ config :adept, Adept.Repo,
 config :arcana,
   repo: Adept.Repo,
   embedder: :local,
-  llm: {"zai:glm-4.7", api_key: System.get_env("ZAI_API_TOKEN")},
   graph: [
     enabled: true,
     entity_extractor: Arcana.Graph.EntityExtractor.LLM,
