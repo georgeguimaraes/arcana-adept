@@ -11,7 +11,8 @@ config :adept, Adept.Repo,
   hostname: "localhost",
   database: "adept_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
-  pool_size: System.schedulers_online() * 2
+  pool_size: System.schedulers_online() * 2,
+  priv: "priv/adept_repo"
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
