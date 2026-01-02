@@ -7,8 +7,17 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 
-# Configure Arcana LLM with Z.ai
-config :arcana, :llm, {"zai:glm-4.7", api_key: System.get_env("ZAI_API_TOKEN")}
+# Configure Arcana
+config :arcana,
+  repo: Adept.Repo,
+  embedder: :local,
+  llm: {"zai:glm-4.7", api_key: System.get_env("ZAI_API_TOKEN")},
+  graph: [
+    enabled: true,
+    entity_extractor: Arcana.Graph.EntityExtractor.LLM,
+    community_levels: 5,
+    resolution: 1.0
+  ]
 
 # ## Using releases
 #

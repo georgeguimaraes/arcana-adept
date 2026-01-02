@@ -12,17 +12,6 @@ config :adept, Adept.Repo,
   types: Adept.PostgrexTypes,
   priv: "priv/adept_repo"
 
-# Configure Arcana
-config :arcana,
-  repo: Adept.Repo,
-  embedder: :local,
-  graph: [
-    enabled: true,
-    entity_extractor: Arcana.Graph.EntityExtractor.LLM,
-    community_levels: 5,
-    resolution: 1.0
-  ]
-
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
