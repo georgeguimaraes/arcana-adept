@@ -14,7 +14,8 @@ config :arcana,
   llm: {"zai:glm-4.7", api_key: System.get_env("ZAI_API_TOKEN")},
   graph: [
     enabled: true,
-    entity_extractor: Arcana.Graph.EntityExtractor.LLM,
+    # Combined extractor: entities + relationships in single LLM call per chunk
+    extractor: Arcana.Graph.GraphExtractor.LLM,
     community_levels: 5,
     resolution: 1.0
   ]
