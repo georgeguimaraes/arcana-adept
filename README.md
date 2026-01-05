@@ -59,6 +59,29 @@ Then search:
 Arcana.search("Who is the Doctor?", repo: Repo, collection: "doctor-who")
 ```
 
+## GraphRAG
+
+Build a knowledge graph from the corpus for enhanced retrieval:
+
+```bash
+# Install graph tables (first time only)
+mix arcana.graph.install
+mix ecto.migrate
+
+# Rebuild graph (extracts entities and relationships)
+mix arcana.graph.rebuild --collection doctor-who
+
+# Detect communities (recommended settings for Doctor Who corpus)
+mix arcana.graph.detect_communities --collection doctor-who --resolution 1.0 --max-level 5
+
+# Generate community summaries (requires LLM config)
+mix arcana.graph.summarize_communities --collection doctor-who
+```
+
+The Doctor Who corpus works well with:
+- **Resolution 1.0** - Balances community size (higher values fragment into smaller groups)
+- **Max level 5** - Allows for hierarchy (actual levels depend on graph structure)
+
 ## Dashboard
 
 The Arcana dashboard at `/arcana` provides:
