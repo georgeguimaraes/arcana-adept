@@ -72,7 +72,7 @@ defmodule Adept.MixProject do
       {:floki, "~> 0.37"},
 
       # Community detection for GraphRAG
-      {:leidenfold, "~> 0.2"}
+      {:leidenfold, "~> 0.3"}
     ]
   end
 
