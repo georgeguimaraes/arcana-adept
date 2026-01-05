@@ -41,7 +41,9 @@ defmodule Adept.MixProject do
   defp deps do
     [
       {:arcana, path: "../arcana"},
+      {:req_llm, github: "agentjido/req_llm", override: true},
       {:exla, "~> 0.9"},
+      {:emlx, "~> 0.2"},
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
@@ -70,7 +72,7 @@ defmodule Adept.MixProject do
       {:floki, "~> 0.37"},
 
       # Community detection for GraphRAG
-      {:ex_leiden, "~> 0.5"}
+      {:leidenfold, "~> 0.2"}
     ]
   end
 
