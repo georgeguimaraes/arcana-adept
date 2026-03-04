@@ -20,7 +20,6 @@ config :arcana,
     resolution: 1.0
   ]
 
-config :arcana, Arcana.Grounding.Serving, model_path: "priv/models/lettucedect/model.onnx"
 
 # ## Using releases
 #

@@ -41,7 +41,7 @@ defmodule Adept.MixProject do
   defp deps do
     [
       {:arcana, path: "../arcana"},
-      {:ortex, "~> 0.1"},
+      {:hallmark, "~> 1.0"},
       {:req_llm, github: "agentjido/req_llm", override: true},
       {:exla, "~> 0.9"},
       {:emlx, "~> 0.2"},
