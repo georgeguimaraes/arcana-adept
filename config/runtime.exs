@@ -20,6 +20,7 @@ config :arcana,
     resolution: 1.0
   ]
 
+
 # ## Using releases
 #
 # If you use `mix release`, you need to explicitly enable the server

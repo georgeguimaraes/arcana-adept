@@ -41,6 +41,7 @@ defmodule Adept.MixProject do
   defp deps do
     [
       {:arcana, path: "../arcana"},
+      {:hallmark, "~> 1.0"},
       {:req_llm, github: "agentjido/req_llm", override: true},
       {:exla, "~> 0.9"},
       {:emlx, "~> 0.2"},
@@ -84,7 +85,14 @@ defmodule Adept.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "arcana.install", "assets.setup", "assets.build"],
+      setup: [
+        "deps.get",
+        "ecto.setup",
+        "arcana.install",
+        "arcana.ground.setup",
+        "assets.setup",
+        "assets.build"
+      ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup", "arcana.install"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
