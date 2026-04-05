@@ -11,15 +11,16 @@ import Config
 config :arcana,
   repo: Adept.Repo,
   embedder: :local,
-  llm: {"zai:glm-4.7", api_key: System.get_env("ZAI_API_TOKEN")},
+  llm:
+    {"zai:#{System.get_env("ARCANA_LLM", "glm-5.1")}", api_key: System.get_env("ZAI_API_TOKEN")},
   graph: [
     enabled: true,
     # Combined extractor: entities + relationships in single LLM call per chunk
     extractor: Arcana.Graph.GraphExtractor.LLM,
     community_levels: 5,
-    resolution: 1.0
+    resolution: 0.25,
+    min_size: 10
   ]
-
 
 # ## Using releases
 #

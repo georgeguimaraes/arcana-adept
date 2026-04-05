@@ -21,7 +21,7 @@ defmodule Adept.MixProject do
   def application do
     [
       mod: {Adept.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :xmerl]
     ]
   end
 
@@ -42,7 +42,7 @@ defmodule Adept.MixProject do
     [
       {:arcana, path: "../arcana"},
       {:hallmark, "~> 1.0"},
-      {:req_llm, github: "agentjido/req_llm", override: true},
+      {:req_llm, "~> 1.6", override: true},
       {:exla, "~> 0.9"},
       {:emlx, "~> 0.2"},
       {:phoenix, "~> 1.8.1"},
