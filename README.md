@@ -2,7 +2,7 @@
 
 Example Phoenix app demonstrating [Arcana](https://github.com/georgeguimaraes/arcana) - an embeddable RAG library for Elixir.
 
-Includes a Doctor Who corpus (452 articles from TARDIS Wiki) ready to embed and query.
+Includes a Doctor Who corpus (108K+ articles from TARDIS Wiki) ready to embed and query.
 
 ## Quick Start
 
@@ -32,31 +32,45 @@ config :nx,
 
 Visit [localhost:4000/arcana](http://localhost:4000/arcana) to access the dashboard.
 
-## Embedding the Doctor Who Corpus
+## Corpus Management
 
-The Doctor Who corpus is at `priv/corpus/doctor_who.json`. Embed it with:
+### Parsing the dump
 
-```elixir
-# In IEx (iex -S mix)
-alias Adept.Repo
+A MediaWiki XML dump is included at `priv/corpus/tardis_pages_current.xml.7z` (94MB).
+Parse it into the JSON corpus (accepts `.7z`, `.gz`, or `.xml` directly):
 
-"priv/corpus/doctor_who.json"
-|> File.read!()
-|> JSON.decode!()
-|> Enum.each(fn %{"title" => title, "content" => content} ->
-  {:ok, _} = Arcana.ingest(content,
-    repo: Repo,
-    collection: "doctor-who",
-    metadata: %{"title" => title}
-  )
-  IO.puts("Ingested: #{title}")
-end)
+```bash
+mix corpus.parse priv/corpus/tardis_pages_current.xml.7z
 ```
 
-Then search:
+To download a fresh dump from Fandom's S3:
+
+```bash
+curl -L -o priv/corpus/tardis_pages_current.xml.7z \
+  "https://s3.amazonaws.com/wikia_xml_dumps/t/ta/tardis_pages_current.xml.7z"
+```
+
+### Ingesting the corpus
+
+Ingest the JSON corpus into Arcana with parallel embedding:
+
+```bash
+# Ingest the default corpus (priv/corpus/doctor_who.json)
+mix corpus.ingest
+
+# Ingest a specific file
+mix corpus.ingest priv/corpus/other.json
+
+# Options
+mix corpus.ingest --collection my-collection  # custom collection name
+mix corpus.ingest --concurrency 32            # override concurrency (default 16)
+mix corpus.ingest --reset                     # wipe existing collection first
+```
+
+### Searching
 
 ```elixir
-Arcana.search("Who is the Doctor?", repo: Repo, collection: "doctor-who")
+Arcana.search("Who is the Doctor?", repo: Adept.Repo, collection: "doctor-who")
 ```
 
 ## GraphRAG

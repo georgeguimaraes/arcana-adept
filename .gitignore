@@ -34,6 +34,11 @@ adept-*.tar
 # ONNX model files (downloaded via mix arcana.ground.setup)
 /priv/models/
 
+# Generated corpus files (built from the 7z dump via mix corpus.parse)
+/priv/corpus/*.json
+/priv/corpus/*.xml
+/priv/corpus/*.7z
+
 # In case you use Node.js/npm, you want to ignore these.
 npm-debug.log
 /assets/node_modules/
