@@ -114,7 +114,6 @@ Known gaps based on current RAG research (see [evaluation baseline](docs/evaluat
 - [x] **Cross-encoder reranking**: `Arcana.Agent.Reranker.CrossEncoder` using ms-marco-MiniLM-L-6-v2 via Bumblebee. MRR +39%, Hit@1 +62%
 - [x] **Evaluation baselines**: 60 synthetic test cases, comparing vector-only, vector+graph, and vector+graph+reranker
 - [ ] **Upgrade embedding model**: BGE-small-en-v1.5 (~51 MTEB) is dated. `nomic-embed-text-v1.5` (~55 MTEB) works with Bumblebee from git (NomicBert support not yet in a hex release). Requires re-embedding
-- [ ] **Multi-hop graph traversal**: increase default depth from 1 to 2 for relational queries. Needs scoring/pruning to avoid traversing the mega-community hub
 - [ ] **HyDE for broad queries**: generate hypothetical answer, embed that, search with it. Bridges vocabulary gap between questions and wiki content
 - [ ] **Graph config docs**: `docs/graph.md` with full config reference for all tunable parameters
 
