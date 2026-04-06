@@ -66,6 +66,31 @@ Generates natural language summaries for each community using the LLM. The promp
 - **40,885 summaries** generated (99.99% coverage)
 - 5 unsummarized: the mega-community repeated across 5 hierarchy levels
 
+## 6. Entity Embeddings
+
+```bash
+mix arcana.graph.embed_entities --collection doctor-who
+```
+
+Generates vector embeddings for entity descriptions, enabling GraphRAG-style entity similarity search. Instead of relying on NER to extract entity names from queries (brittle, misses paraphrases), the search pipeline embeds the query and finds similar entities by cosine distance against their description embeddings.
+
+This step is automatically done during `mix arcana.graph.rebuild` for new extractions. Run it separately to backfill embeddings for entities extracted before this feature was added.
+
+- **362K entities** to embed
+- Text embedded per entity: `"name: description"` or just `"name"` when no description
+- Uses the same embedder as document chunks (BAAI/bge-small-en-v1.5)
+
+## Pipeline Summary
+
+```
+1. mix corpus.parse                           # Wiki XML → JSON
+2. mix corpus.ingest                          # JSON → chunks + embeddings
+3. mix arcana.graph.rebuild                   # Chunks → entities + relationships (+ entity embeddings)
+4. mix arcana.graph.detect_communities        # Entities → Leiden communities
+5. mix arcana.graph.summarize_communities     # Communities → LLM summaries
+6. mix arcana.graph.embed_entities            # (backfill only) Entity descriptions → embeddings
+```
+
 ## Config
 
 ```elixir
