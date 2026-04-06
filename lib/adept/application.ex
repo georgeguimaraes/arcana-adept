@@ -7,6 +7,9 @@ defmodule Adept.Application do
 
   @impl true
   def start(_type, _args) do
+    # Set EMLX as the global Nx backend for Apple Silicon GPU acceleration
+    Nx.global_default_backend({EMLX.Backend, device: :gpu})
+
     # Attach Arcana telemetry handlers for logging
     Arcana.Telemetry.Logger.attach()
 
