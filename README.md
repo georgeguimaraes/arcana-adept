@@ -106,6 +106,32 @@ The Arcana dashboard at `/arcana` provides:
 - **Collections** - Organize documents by topic
 - **Evaluation** - Measure retrieval quality
 
+## TODO
+
+Known gaps based on current RAG research (see [evaluation baseline](docs/evaluation-baseline.md) for measurements):
+
+- [x] **Community summaries in ask pipeline**: injected as "background knowledge" in the LLM prompt alongside retrieved chunks
+- [x] **Cross-encoder reranking**: `Arcana.Agent.Reranker.CrossEncoder` using ms-marco-MiniLM-L-6-v2 via Bumblebee. MRR +39%, Hit@1 +62%
+- [x] **Evaluation baselines**: 60 synthetic test cases, comparing vector-only, vector+graph, and vector+graph+reranker
+- [ ] **Upgrade embedding model**: BGE-small-en-v1.5 (~51 MTEB) is dated. `nomic-embed-text-v1.5` (~55 MTEB) works with Bumblebee from git (NomicBert support not yet in a hex release). Requires re-embedding
+- [ ] **Multi-hop graph traversal**: increase default depth from 1 to 2 for relational queries. Needs scoring/pruning to avoid traversing the mega-community hub
+- [ ] **HyDE for broad queries**: generate hypothetical answer, embed that, search with it. Bridges vocabulary gap between questions and wiki content
+- [ ] **Graph config docs**: `docs/graph.md` with full config reference for all tunable parameters
+
+## References
+
+Papers and resources that informed the GraphRAG pipeline and retrieval strategy:
+
+- [From Local to Global: A Graph RAG Approach to Query-Focused Summarization](https://arxiv.org/abs/2404.16130) (Microsoft, 2024) — community summaries for global search over knowledge graphs
+- [Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172) (Liu et al., 2023) — context ordering matters for LLM retrieval
+- [HopRAG: Multi-Hop Reasoning for Knowledge-Aware RAG](https://arxiv.org/abs/2502.12442) (ACL 2025) — graph traversal with LLM-guided pruning
+- [RAGAS: Automated Evaluation of Retrieval Augmented Generation](https://arxiv.org/abs/2309.15217) (Shahul et al., 2023) — faithfulness, relevance, and context metrics
+- [Graph Retrieval-Augmented Generation: A Survey](https://arxiv.org/abs/2408.08921) (2024) — comprehensive survey of Graph RAG approaches
+- [RAG vs. GraphRAG: A Systematic Evaluation](https://arxiv.org/abs/2502.11371) (2025) — when graph-enhanced retrieval helps vs plain RAG
+- [Precise Zero-Shot Dense Retrieval without Relevance Labels (HyDE)](https://arxiv.org/abs/2212.10496) (Gao et al., 2022) — hypothetical document embeddings for query expansion
+- [LettuceDetect: A Hallucination Detector for RAG](https://arxiv.org/abs/2502.17125) (2025) — token-level grounding for faithfulness checking
+- [Agentic RAG with Knowledge Graphs](https://arxiv.org/abs/2507.16507) (2025) — iterative retrieval and reasoning over graph structures
+
 ## License
 
 Apache-2.0 - See [LICENSE](LICENSE)
