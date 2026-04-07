@@ -317,3 +317,105 @@ piece of work.
   class of questions Pipeline gets wrong and Loop gets right,
   this eval won't show it because the test set was generated
   against Pipeline's strengths.
+
+## Pipeline on the multi-hop set with answer scoring (2026-04-07)
+
+First end-to-end Pipeline eval against the 10-case multi-hop set
+with `evaluate_answers: true` (LLM-as-judge for faithfulness and
+correctness, glm-4.6 as the judge). Run via the new
+`scripts/eval_pipeline.exs` script:
+
+```
+ARCANA_LLM=glm-4.6 EVAL_ANSWERS=true mix run scripts/eval_pipeline.exs
+```
+
+Branch state at the time of this run: `fix/graph-robustness` with
+GraphRAG Local Search alignment (entity embedding search, structured
+ask context, community summaries, cross-encoder reranker).
+
+| Metric | Pipeline (multi-hop) |
+|---|---|
+| **MRR** | 1.000 |
+| **Hit@1** | 1.000 |
+| **Hit@3** | 1.000 |
+| **Hit@5** | 1.000 |
+| **Hit@10** | 1.000 |
+| **Recall@5** | 0.500 |
+| **Recall@10** | 1.000 |
+| **Faithfulness** | 10.0 / 10 |
+| **Correctness** | 7.8 / 10 |
+
+Per-case correctness breakdown (faithfulness was 10 across the board):
+
+| Score | Question |
+|---|---|
+| 10 | What are the known weaknesses of the Cybermen across different eras? |
+| 10 | What are the main abilities and unusual properties of the TARDIS? |
+| 10 | Which Time Lords have betrayed the Doctor across the show's history? |
+| 10 | Which companions have become Time Lords or Time Lord-like beings? |
+| 10 | Which historical figures has the Doctor met, and in which stories? |
+| 9 | How has the Master's character and appearance evolved across different incarnations? |
+| 9 | What role did the Daleks play during the Last Great Time War? |
+| 5 | What is the evolution of the sonic screwdriver's capabilities over the show's history? |
+| 5 | Who are the most notable companions of the Fourth Doctor and what distinguishes each? |
+| 0 | How has Gallifrey's depiction changed between the classic and modern series? |
+
+### Interpretation
+
+**Retrieval is essentially solved on this set.** Hit@1 1.0 means the
+top-ranked chunk was always one of the relevant set, MRR 1.0 confirms
+rank 1 every time. Recall@10 1.0 means the full relevant chunk set
+was retrieved within k=10 for every case. The GraphRAG entity
+embedding work + cross-encoder reranking is doing what it should: even
+on multi-hop questions where the answer spans multiple chunks, the
+retriever surfaces all the right ones.
+
+**Faithfulness 10/10 across the board** means every answer the LLM
+produced stayed grounded in the retrieved context. No hallucinations
+on this set. That's the GraphRAG "structured context" work paying
+off — entities, relationships, and community summaries give the LLM
+enough scaffolding to commit to grounded answers instead of filling
+gaps with plausible-sounding fiction.
+
+**Correctness 7.8/10 average is the realistic ceiling and the place
+to improve.** Two failure modes:
+
+1. *Comparative / "evolution over time" questions* (sonic screwdriver,
+   Fourth Doctor companions, Gallifrey old vs new). These need the
+   answer to span multiple eras, and the retrieved chunks tend to
+   over-represent one era. The single Gallifrey 0 is the worst case:
+   retrieval found Gallifrey chunks, but they were all classic-era,
+   so the answer couldn't compare classic vs modern.
+2. *Enumeration questions where the relevant set is large.* Recall@5
+   is only 0.5, so at the rerank cap of 5 the answer only sees half
+   the relevant chunks. Increasing `limit` would help here at the
+   cost of more tokens.
+
+### Caveats
+
+- **This is not a direct comparison to the 2026-04-06 baseline.**
+  That baseline was 60 single-chunk synthetic cases (one expected
+  chunk each). This run is 10 multi-hop manual cases (multiple
+  expected chunks each, with ground-truth reference answers). The
+  retrieval metrics aren't apples-to-apples.
+- **MRR/Hit@k on multi-hop is "at least one relevant chunk in top
+  k", not "exact chunk in top k".** That's why Hit@1 can be 1.0
+  while Recall@5 is 0.5 — the first chunk is always relevant, but
+  the top 5 only cover half the relevant set per case.
+- **Faithfulness 10/10 is suspiciously perfect** and suggests the
+  LLM-as-judge is permissive. A harder set with adversarial
+  questions would probably surface real ungrounded claims.
+- **All scoring uses glm-4.6 as both the answerer and the judge.**
+  Same-model judging biases toward the answerer. A different judge
+  model (claude or gpt) would be a stronger validation.
+
+### What the answer eval framework needed to make this work
+
+The first run produced nil for every faithfulness and correctness
+score. Root cause: glm-4.6 wraps JSON output in ` ```json ... ``` `
+markdown fences even when the prompt asks for "JSON only", and
+`Arcana.Evaluation.AnswerMetrics.parse_response/1` was passing the
+fenced text straight to `JSON.decode/1`, which choked on the
+backticks and returned `:invalid_response`. Every per-case score
+collapsed silently and the aggregate came back nil. Fixed in
+arcana 1ba19c4 by stripping the fence before decoding.
