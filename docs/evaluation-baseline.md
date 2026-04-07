@@ -322,11 +322,10 @@ piece of work.
 
 First end-to-end Pipeline eval against the 10-case multi-hop set
 with `evaluate_answers: true` (LLM-as-judge for faithfulness and
-correctness, glm-4.6 as the judge). Run via the new
-`scripts/eval_pipeline.exs` script:
+correctness, glm-4.6 as the judge). Run via `mix adept.eval`:
 
 ```
-ARCANA_LLM=glm-4.6 EVAL_ANSWERS=true mix run scripts/eval_pipeline.exs
+ARCANA_LLM=glm-4.6 mix adept.eval --evaluate-answers
 ```
 
 Branch state at the time of this run: `fix/graph-robustness` with
