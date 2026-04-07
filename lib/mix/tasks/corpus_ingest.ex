@@ -52,6 +52,12 @@ defmodule Mix.Tasks.Corpus.Ingest do
 
     total = length(articles)
     Mix.shell().info("Found #{total} articles (sorted shortest-first)")
+
+    if total == 0 do
+      Mix.shell().info("Nothing to ingest.")
+      exit(:normal)
+    end
+
     {emb_module, _} = Arcana.Config.embedder()
 
     embedder_label =
@@ -177,23 +183,33 @@ defmodule Mix.Tasks.Corpus.Ingest do
         Mix.shell().info("  Collection not found, nothing to reset")
 
       collection_id ->
-        doc_ids =
-          Adept.Repo.all(
-            from d in "arcana_documents",
-              where: d.collection_id == ^collection_id,
-              select: d.id
-          )
+        # Wrap the three deletes in a transaction so a crash mid-reset
+        # can't leave orphaned chunks pointing at a deleted document.
+        # The chunks delete uses a subquery (rather than fetching all
+        # document ids into Elixir and passing them via `in ^doc_ids`)
+        # so huge collections don't trip Postgres' parameter limit.
+        {:ok, {chunks, docs, colls}} =
+          Adept.Repo.transaction(fn ->
+            docs_query =
+              from d in "arcana_documents",
+                where: d.collection_id == ^collection_id,
+                select: d.id
 
-        {chunks, _} =
-          Adept.Repo.delete_all(from ch in "arcana_chunks", where: ch.document_id in ^doc_ids)
+            {chunks, _} =
+              Adept.Repo.delete_all(
+                from ch in "arcana_chunks", where: ch.document_id in subquery(docs_query)
+              )
 
-        {docs, _} =
-          Adept.Repo.delete_all(
-            from d in "arcana_documents", where: d.collection_id == ^collection_id
-          )
+            {docs, _} =
+              Adept.Repo.delete_all(
+                from d in "arcana_documents", where: d.collection_id == ^collection_id
+              )
 
-        {colls, _} =
-          Adept.Repo.delete_all(from c in "arcana_collections", where: c.id == ^collection_id)
+            {colls, _} =
+              Adept.Repo.delete_all(from c in "arcana_collections", where: c.id == ^collection_id)
+
+            {chunks, docs, colls}
+          end)
 
         Mix.shell().info("  Deleted #{chunks} chunks, #{docs} documents, #{colls} collection")
     end
