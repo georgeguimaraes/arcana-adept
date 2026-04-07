@@ -8,7 +8,7 @@ config :adept, Adept.Repo,
   database: "adept_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 40,
+  pool_size: 80,
   types: Adept.PostgrexTypes,
   priv: "priv/adept_repo"
 
