@@ -39,6 +39,9 @@ adept-*.tar
 /priv/corpus/*.xml
 /priv/corpus/*.7z
 
+# Database dumps (created via scripts/db_dump.sh)
+/dumps/*.sql.gz
+
 # In case you use Node.js/npm, you want to ignore these.
 npm-debug.log
 /assets/node_modules/
