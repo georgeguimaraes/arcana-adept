@@ -7,7 +7,11 @@ defmodule Adept.Application do
 
   @impl true
   def start(_type, _args) do
-    Nx.global_default_backend({EMLX.Backend, device: :gpu})
+    # On macOS use EMLX with GPU device, on other platforms use EXLA
+    case :os.type() do
+      {:unix, :darwin} -> Nx.global_default_backend({EMLX.Backend, device: :gpu})
+      _ -> Nx.global_default_backend(EXLA.Backend)
+    end
 
     # Attach Arcana telemetry handlers for logging
     Arcana.Telemetry.Logger.attach()

@@ -8,8 +8,14 @@
 import Config
 
 # Nx backend for local embeddings
-config :nx,
-  default_backend: EMLX.Backend
+# Use EMLX (Apple Silicon GPU) on macOS, EXLA elsewhere
+nx_backend =
+  case :os.type() do
+    {:unix, :darwin} -> EMLX.Backend
+    _ -> EXLA.Backend
+  end
+
+config :nx, default_backend: nx_backend
 
 config :adept,
   ecto_repos: [Adept.Repo],
