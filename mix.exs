@@ -43,7 +43,12 @@ defmodule Adept.MixProject do
       {:arcana, path: "../arcana"},
       {:hallmark, "~> 1.0"},
       {:req_llm, "~> 1.6", override: true},
-      {:exla, "~> 0.9"},
+      {:exla, "~> 0.10.0"},
+      # Pinned to 0.1.4 because 0.1.5 changed how `init_atoms` and
+      # `init_resources` are declared, which produces duplicate-symbol
+      # linker errors when exla is built on macOS. Can move to `~> 0.1`
+      # once exla picks up the fix or we switch to a newer exla release.
+      {:fine, "== 0.1.4", override: true},
       {:emlx, github: "elixir-nx/emlx", override: true},
       {:nx, github: "elixir-nx/nx", sparse: "nx", override: true},
       {:bumblebee, github: "elixir-nx/bumblebee", override: true},
