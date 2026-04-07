@@ -96,6 +96,55 @@ The Doctor Who corpus works well with:
 - **Resolution 1.0** - Balances community size (higher values fragment into smaller groups)
 - **Max level 5** - Allows for hierarchy (actual levels depend on graph structure)
 
+## Evaluation
+
+Adept ships two mix tasks wrapping `Arcana.Evaluation` against the
+doctor-who corpus. See [`docs/evaluation-baseline.md`](docs/evaluation-baseline.md)
+for recorded results.
+
+### Seeding the test set
+
+The default `Arcana.Evaluation.generate_test_cases/1` produces single-chunk
+relevance tests (one chunk sampled per case), which is exactly what
+Pipeline is optimized for and says nothing about Loop's multi-hop
+synthesis value. `mix adept.eval.seed` seeds ~10 hand-crafted multi-hop
+questions with LLM-generated reference answers:
+
+```bash
+mix adept.eval.seed            # seed only missing questions
+mix adept.eval.seed --reset     # wipe manual cases first
+```
+
+Requires the configured LLM (e.g. `ZAI_API_TOKEN` for Z.ai). Safe to
+re-run — questions with an existing manual test case are skipped.
+
+### Running the eval
+
+`mix adept.eval` runs the evaluation suite against the seeded test
+cases and prints retrieval metrics (MRR, Hit@k, Recall@k), plus
+optional LLM-as-judge faithfulness and correctness scores:
+
+```bash
+# Pipeline (default), retrieval metrics only
+mix adept.eval
+
+# Arcana.Loop agentic retriever
+mix adept.eval --retriever loop
+
+# Also score answer quality via LLM-as-judge
+mix adept.eval --evaluate-answers
+
+# Smoke run against the first N test cases
+mix adept.eval --limit 5
+
+# Loop-specific tuning
+mix adept.eval --retriever loop --max-iterations 10 --chunk-cap 30
+```
+
+Pipeline runs are fast (pgvector + reranker, no LLM calls in the
+retriever path). Loop and `--evaluate-answers` runs are dominated by
+LLM round-trip time — expect 30-60 seconds per case.
+
 ## Dashboard
 
 The Arcana dashboard at `/arcana` provides:
