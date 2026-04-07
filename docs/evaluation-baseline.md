@@ -74,3 +74,60 @@ Community summaries were moved from the search path to the ask pipeline (injecte
 - Embedding model (BGE-small) could be upgraded
 - Multi-hop graph traversal (depth 1 → 2)
 - HyDE for broad thematic queries
+
+## Arcana.Loop on doctor-who (2026-04-08)
+
+First end-to-end runs of the new `Arcana.Loop` agentic RAG module against
+the doctor-who corpus. Loop drives an LLM tool loop with five default tools
+(search, rewrite, decompose, answer, give_up) and falls back to chunk
+synthesis when `max_iterations` is hit without an `answer` call.
+
+Setup: `Adept.Repo`, `doctor-who` collection, default search (vector +
+graph + cross-encoder reranker, the same baseline as above), `chunk_cap:
+20`, `max_iterations: 6`. Numbers are wall-clock from a single machine,
+not benchmarks.
+
+| Question | Model | Iterations | Outcome | Wall-clock |
+|---|---|---|---|---|
+| "What is a TARDIS?" | glm-4.5-flash | 3 (2 search + answer) | answered cleanly | 81.5s |
+| "What is a TARDIS?" | glm-4.6 | 6 searches | max_iterations + synthesis | 27.3s |
+| "Which Time Lords have betrayed the Doctor across the show's history?" | glm-4.6 | 6 searches | max_iterations + synthesis | 34.2s |
+| "Which Time Lords have betrayed the Doctor across the show's history?" (10 iter cap) | glm-4.6 | 10 searches | max_iterations + synthesis | 51.2s |
+
+Observations:
+
+- `glm-4.5-flash` was actually slower per iteration (~27s) than `glm-4.6`
+  (~5s) on this corpus, the opposite of what the names suggest. Likely
+  Z.ai routing or queue position, not anything inherent to either model.
+- Both models reliably refuse to call `answer` on enumeration questions
+  ("which X have done Y") even with 10 iterations of room. They keep
+  hunting for completeness one entity at a time. The fallback synthesis
+  step is what saves these runs: at the end of the loop, Arcana makes one
+  more tool-less LLM call with the accumulated chunks and the original
+  question, and the model produces a structured answer covering Rassilon,
+  the Valeyard, the Master, Omega, and friends.
+- For factoid questions ("what is a TARDIS"), glm-4.5-flash hits the
+  happy path: 2 searches, then `answer`, ~81s end to end (which is too
+  slow for a chat UX but fine for a research agent).
+- Iteration time is dominated by the controller LLM round-trip. Pgvector
+  search against 174K chunks is sub-second per call.
+- OpenAI was attempted but the API key in this environment has an
+  `invalid_organization` binding that 401s before reaching any model, so
+  no OpenAI numbers here.
+
+Two real issues found and fixed in `Arcana.Loop` while running this:
+
+1. Z.ai's encoder rejected our assistant tool calls because they were
+   plain `%{id, name, arguments}` maps. They need to be `ReqLLM.ToolCall`
+   structs so the encoder wraps them as
+   `{id, type: "function", function: %{name, arguments}}`.
+2. Tuple LLM specs like `{"zai:glm-4.6", api_key: "..."}` (the
+   `Arcana.Config` convention) weren't being unwrapped before reaching
+   `ReqLLM.generate_text`. Loop now handles both string and tuple model
+   specs the same way the rest of Arcana does.
+
+The third "fix" was actually a redesign: graceful degradation via
+`fallback_synthesis`. Without it, enumeration questions return `nil`
+answers, which is technically correct given `max_iterations` semantics
+but useless in practice. With it, the loop almost always returns
+something usable.
