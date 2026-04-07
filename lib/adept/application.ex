@@ -7,6 +7,8 @@ defmodule Adept.Application do
 
   @impl true
   def start(_type, _args) do
+    Nx.global_default_backend({EMLX.Backend, device: :gpu})
+
     # Attach Arcana telemetry handlers for logging
     Arcana.Telemetry.Logger.attach()
 

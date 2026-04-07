@@ -9,8 +9,7 @@ import Config
 
 # Nx backend for local embeddings
 config :nx,
-  default_backend: EXLA.Backend,
-  default_defn_options: [compiler: EXLA]
+  default_backend: EMLX.Backend
 
 config :adept,
   ecto_repos: [Adept.Repo],
