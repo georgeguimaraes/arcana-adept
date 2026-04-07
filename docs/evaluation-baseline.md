@@ -171,3 +171,40 @@ turn (from ~2KB to ~4-5KB). For a 6-iteration loop that's ~12KB of
 tool result text the controller processes, well within any modern
 context window. The latency cost is real and dominated by LLM
 round-trip time, not the search itself.
+
+### Re-run after dropping rewrite and decompose tools (2026-04-08)
+
+Across every run above the controllers had ignored the `rewrite` and
+`decompose` tools entirely — every tool history was just sequential
+`search` calls. Both tools were no-ops on loop state (they returned
+hint text back to the controller without triggering anything), so the
+model correctly skipped the indirection and refined queries inline
+instead. Per Anthropic's tool sprawl guidance ("drop tools that don't
+actually change agent behavior") the right move was to remove them.
+
+The behaviors weren't lost — the system prompt now explicitly tells
+the controller to mentally rewrite vague queries before searching and
+to issue sequential searches per aspect for multi-part questions.
+There just isn't a dedicated tool for either anymore.
+
+Same questions, same models, three-tool default (`search`, `answer`,
+`give_up`):
+
+| Question | Model | Iterations | Outcome | Wall-clock |
+|---|---|---|---|---|
+| "What is a TARDIS?" | glm-4.6 | 3 (2 search + answer) | answered cleanly | 17.5s |
+| "Which Time Lords have betrayed the Doctor across the show's history?" | glm-4.6 | 6 searches | max_iterations + synthesis | 58.1s |
+
+Behavior is essentially identical to the 5-tool runs, which confirms
+the hypothesis that `rewrite` and `decompose` were dead weight: the
+controllers were already getting the same outcomes via direct
+`search` calls. The TARDIS path is ~30% faster (17.5s vs 24.6s),
+almost certainly because the per-turn system prompt is shorter
+without the descriptions for the dropped tools. The enumeration
+path still hits `max_iterations` because that's a model-behavior
+issue with "list all X" questions, not a tool-availability issue.
+
+The synthesized Time Lord answer this round covered 7 entities
+(Master, Valeyard, Rassilon, Omega, High Council, General Tannis,
+Rani) vs 6 in the previous full-chunks run; that's normal LLM
+variance, not a behavior change.
