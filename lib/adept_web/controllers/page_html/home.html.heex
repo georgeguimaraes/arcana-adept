@@ -95,17 +95,17 @@
         <div class="w-3 h-3 rounded-full bg-green-400/60"></div>
         <span class="text-purple-400/50 text-xs ml-2 font-mono">iex</span>
       </div>
-      <pre class="text-sm leading-relaxed overflow-x-auto"><code class="text-purple-200"><span class="text-purple-400">alias</span> Arcana.Agent
+      <pre class="text-sm leading-relaxed overflow-x-auto"><code class="text-purple-200"><span class="text-purple-400">alias</span> Arcana.Pipeline
 
 ctx =
-  Agent.new(<span class="text-emerald-400">"How does Elixir handle concurrency?"</span>,
+  Pipeline.new(<span class="text-emerald-400">"How does Elixir handle concurrency?"</span>,
     repo: MyApp.Repo,
     llm: llm
   )
-  |> Agent.search()
-  |> Agent.rerank()
-  |> Agent.answer()
-  |> Agent.ground()
+  |> Pipeline.search()
+  |> Pipeline.rerank()
+  |> Pipeline.answer()
+  |> Pipeline.ground()
 
 ctx.grounding.score        <span class="text-purple-500"># => 0.96</span>
 ctx.grounding.hallucinated_spans  <span class="text-purple-500"># => []</span></code></pre>

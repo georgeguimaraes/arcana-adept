@@ -54,7 +54,7 @@ Key findings:
 
 ## Cross-encoder reranking (2026-04-06)
 
-Added `Arcana.Agent.Reranker.CrossEncoder` using `cross-encoder/ms-marco-MiniLM-L-6-v2` via Bumblebee. Runs locally via Nx.Serving. Also added `:reranker` option to `Arcana.Search.search/2` so reranking works outside the Agent pipeline: over-fetches 3x candidates, reranks, returns top-k.
+Added `Arcana.Pipeline.Reranker.CrossEncoder` using `cross-encoder/ms-marco-MiniLM-L-6-v2` via Bumblebee. Runs locally via Nx.Serving. Also added `:reranker` option to `Arcana.Search.search/2` so reranking works outside the Agent pipeline: over-fetches 3x candidates, reranks, returns top-k.
 
 | Metric | Vector Only | Vector + Graph | **+ Cross-Encoder Reranker** |
 |--------|------------|----------------|------------------------------|

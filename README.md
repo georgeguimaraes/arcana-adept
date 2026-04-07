@@ -111,7 +111,7 @@ The Arcana dashboard at `/arcana` provides:
 Known gaps based on current RAG research (see [evaluation baseline](docs/evaluation-baseline.md) for measurements):
 
 - [x] **Community summaries in ask pipeline**: injected as "background knowledge" in the LLM prompt alongside retrieved chunks
-- [x] **Cross-encoder reranking**: `Arcana.Agent.Reranker.CrossEncoder` using ms-marco-MiniLM-L-6-v2 via Bumblebee. MRR +39%, Hit@1 +62%
+- [x] **Cross-encoder reranking**: `Arcana.Pipeline.Reranker.CrossEncoder` using ms-marco-MiniLM-L-6-v2 via Bumblebee. MRR +39%, Hit@1 +62%
 - [x] **Evaluation baselines**: 60 synthetic test cases, comparing vector-only, vector+graph, and vector+graph+reranker
 - [ ] **Upgrade embedding model**: BGE-small-en-v1.5 (~51 MTEB) is dated. `nomic-embed-text-v1.5` (~55 MTEB) works with Bumblebee from git (NomicBert support not yet in a hex release). Requires re-embedding
 - [ ] **HyDE for broad queries**: generate hypothetical answer, embed that, search with it. Bridges vocabulary gap between questions and wiki content
