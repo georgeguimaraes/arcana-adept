@@ -131,3 +131,43 @@ The third "fix" was actually a redesign: graceful degradation via
 answers, which is technically correct given `max_iterations` semantics
 but useless in practice. With it, the loop almost always returns
 something usable.
+
+### Re-run with full chunk text in tool results (2026-04-08)
+
+The runs above were done with the search tool returning 400-character
+truncated chunk previews to the controller. I borrowed that pattern
+from Anthropic's general agent-design guidance (keep tool results
+terse), but the agentic RAG papers (Self-RAG, CRAG) all pass full
+passages to the model, and that's the right model here too: the
+controller IS the answerer in this loop and it needs the actual
+evidence to decide whether what it has is enough to commit.
+
+After dropping the truncation (one `Tools.format_search_summary`
+change), same questions, same models, same `max_iterations: 6`:
+
+| Question | Model | Iterations | Outcome | Wall-clock |
+|---|---|---|---|---|
+| "What is a TARDIS?" | glm-4.6 | 4 (3 search + answer) | **answered cleanly** | 24.6s |
+| "Which Time Lords have betrayed the Doctor across the show's history?" | glm-4.6 | 6 searches | max_iterations + synthesis | 60.4s |
+
+The factoid question is the dramatic improvement: glm-4.6 went from
+6 searches with no `answer` call (fallback synthesis required) to
+3 searches and a clean `answer` call in 24.6s. The over-search
+failure mode on factoid questions was downstream of the truncation:
+the model never saw enough of any chunk to commit, so it kept
+refining queries indefinitely. With full chunks it commits.
+
+The enumeration question still hits `:max_iterations`, but the
+synthesized answer covers six distinct Time Lords (Master/Missy,
+War Chief, Rani, Monk, Omega, Rassilon) with substantive
+characterization, vs four (Rassilon, Valeyard, Master, Omega) in
+the truncated run. The accumulated chunks now contain real evidence
+for the synthesizer to work with, not 400-char previews. Wall-clock
+went up from 34s to 60s because each iteration sends more tokens to
+the controller, which is the expected tradeoff.
+
+Cost note: full chunks roughly double the tokens per controller
+turn (from ~2KB to ~4-5KB). For a 6-iteration loop that's ~12KB of
+tool result text the controller processes, well within any modern
+context window. The latency cost is real and dominated by LLM
+round-trip time, not the search itself.
