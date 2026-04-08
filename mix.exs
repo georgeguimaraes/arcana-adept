@@ -41,7 +41,12 @@ defmodule Adept.MixProject do
   defp deps do
     [
       {:arcana, path: "../arcana"},
-      {:hallmark, "~> 1.0"},
+      {:hallmark, "~> 1.1"},
+      # Markdown rendering for the dashboard's Ask page. Optional in
+      # arcana but the dashboard wants it, so adept pulls it in
+      # explicitly. CommonMark + GFM via comrak with ammonia
+      # sanitization for LLM output.
+      {:mdex, "~> 0.12"},
       {:req_llm, "~> 1.6", override: true},
       {:exla, "~> 0.10.0"},
       # Pinned to 0.1.4 because 0.1.5 changed how `init_atoms` and

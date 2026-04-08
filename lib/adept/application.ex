@@ -7,10 +7,22 @@ defmodule Adept.Application do
 
   @impl true
   def start(_type, _args) do
-    # On macOS use EMLX with GPU device, on other platforms use EXLA
+    # On macOS use EMLX with GPU device, on other platforms use EXLA.
+    # Set BOTH the global tensor backend AND the default Nx.Defn
+    # compiler so libraries that JIT-compile forward passes (Bumblebee,
+    # Hallmark, Axon.predict) end up running on the same backend their
+    # weights were loaded onto. Otherwise predict_batch produces
+    # tensors on one backend and the weights live on another, and any
+    # subsequent Nx op that mixes them crashes (see Hallmark's
+    # classifier head matmul for an example).
     case :os.type() do
-      {:unix, :darwin} -> Nx.global_default_backend({EMLX.Backend, device: :gpu})
-      _ -> Nx.global_default_backend(EXLA.Backend)
+      {:unix, :darwin} ->
+        Nx.global_default_backend({EMLX.Backend, device: :gpu})
+        Nx.Defn.default_options(compiler: EMLX)
+
+      _ ->
+        Nx.global_default_backend(EXLA.Backend)
+        Nx.Defn.default_options(compiler: EXLA)
     end
 
     # Attach Arcana telemetry handlers for logging
