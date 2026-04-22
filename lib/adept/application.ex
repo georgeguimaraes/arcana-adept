@@ -35,6 +35,8 @@ defmodule Adept.Application do
       {Phoenix.PubSub, name: Adept.PubSub},
       # Local embedder for Arcana
       Arcana.Embedder.Local,
+      # Local cross-encoder reranker (used by Pipeline rerank step)
+      Arcana.Reranker.CrossEncoder,
       Arcana.TaskSupervisor,
       # Start to serve requests, typically the last entry
       AdeptWeb.Endpoint
