@@ -47,13 +47,13 @@ defmodule Adept.MixProject do
       # explicitly. CommonMark + GFM via comrak with ammonia
       # sanitization for LLM output.
       {:mdex, "~> 0.12"},
-      {:req_llm, "~> 1.6", override: true},
-      {:exla, "~> 1.0", override: true},
+      {:req_llm, "~> 1.6"},
+      {:exla, "~> 1.0"},
       # Held at 0.1.x because exla 1.0.0 accepts `~> 0.1` but its NIF does
       # not compile against fine 0.2. Remove once an exla release needs 0.2.
       {:fine, "~> 0.1.6"},
       {:emlx, github: "elixir-nx/emlx", sparse: "emlx", override: true},
-      {:nx, "~> 1.0", override: true},
+      {:nx, "~> 1.0"},
       {:bumblebee, "~> 0.8"},
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},
