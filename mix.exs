@@ -48,25 +48,23 @@ defmodule Adept.MixProject do
       # sanitization for LLM output.
       {:mdex, "~> 0.12"},
       {:req_llm, "~> 1.6", override: true},
-      {:exla, "~> 0.10.0"},
-      # Pinned to 0.1.4 because 0.1.5 changed how `init_atoms` and
-      # `init_resources` are declared, which produces duplicate-symbol
-      # linker errors when exla is built on macOS. Can move to `~> 0.1`
-      # once exla picks up the fix or we switch to a newer exla release.
-      {:fine, "== 0.1.4", override: true},
-      {:emlx, github: "elixir-nx/emlx", override: true},
-      {:nx, github: "elixir-nx/nx", sparse: "nx", override: true},
-      {:bumblebee, github: "elixir-nx/bumblebee", override: true},
+      {:exla, "~> 1.0", override: true},
+      # Held at 0.1.x because exla 1.0.0 accepts `~> 0.1` but its NIF does
+      # not compile against fine 0.2. Remove once an exla release needs 0.2.
+      {:fine, "~> 0.1.6"},
+      {:emlx, github: "elixir-nx/emlx", sparse: "emlx", override: true},
+      {:nx, "~> 1.0", override: true},
+      {:bumblebee, "~> 0.8"},
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
       {:postgrex, ">= 0.0.0"},
-      {:pgvector, "~> 0.3.0"},
+      {:pgvector, "~> 0.4"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 1.1.0"},
+      {:phoenix_live_view, "~> 1.2"},
       {:lazy_html, ">= 0.1.0", only: :test},
-      {:phoenix_live_dashboard, "~> 0.8.3"},
+      {:phoenix_live_dashboard, "~> 0.9"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:heroicons,
@@ -79,7 +77,7 @@ defmodule Adept.MixProject do
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
-      {:dns_cluster, "~> 0.2.0"},
+      {:dns_cluster, "~> 0.3"},
       {:bandit, "~> 1.5"},
       {:req, "~> 0.5"},
       {:floki, "~> 0.37"},
